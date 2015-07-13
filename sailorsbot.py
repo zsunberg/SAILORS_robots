@@ -63,38 +63,44 @@ def scomm(id_num, shared):
     s.settimeout(0.01)
 
     while True:
-        time.sleep(0.2)
 
-        if shared['direct_pipe'].poll():
-            s.send(shared['direct_pipe'].recv())
-
-        s.send('l:{}\n'.format(shared['left_motor'].value))
-        s.send('r:{}\n'.format(shared['right_motor'].value))
-
-        data = None
         try:
-            data = s.recv(1024)
-        except socket.timeout, e:
-            pass
-        
-        # print(data)
+            time.sleep(0.2)
 
-        if data is not None:
-            for d in data.split('\n'):
-                try:
-                    if d[1] == ':': # this is data that has a specific meaning
-                        if d[0] == 'p': # line position
-                            shared['line_position'].value = float(d[2:])
-                        elif d[0] == 's': # sensors
-                            vals = [int(v) for v in d[2:].split(',')]
-                            for i in range(len(vals)):
-                                shared['sensors'][i] = vals[i]
+            if shared['direct_pipe'].poll():
+                s.send(shared['direct_pipe'].recv())
+
+            s.send('l:{}\n'.format(shared['left_motor'].value))
+            s.send('r:{}\n'.format(shared['right_motor'].value))
+
+            data = None
+            try:
+                data = s.recv(1024)
+            except socket.timeout, e:
+                pass
+            
+            # print(data)
+
+            if data is not None:
+                for d in data.split('\n'):
+                    try:
+                        if d[1] == ':': # this is data that has a specific meaning
+                            if d[0] == 'p': # line position
+                                shared['line_position'].value = float(d[2:])
+                            elif d[0] == 's': # sensors
+                                vals = [int(v) for v in d[2:].split(',')]
+                                for i in range(len(vals)):
+                                    shared['sensors'][i] = vals[i]
+                            else:
+                                print(d)
                         else:
                             print(d)
-                    else:
-                        print(d)
-                except (IndexError, ValueError) as e:
-                    warn(str(e))
+                    except (IndexError, ValueError) as e:
+                        warn(str(e))
+
+        except KeyboardInterrupt as e:
+            shared['left_motor'] = 0.0
+            shared['right_motor'] = 0.0
 
     # will never get here - hopefully things will end up ok if the process is terminated
     s.close()
