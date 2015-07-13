@@ -99,8 +99,8 @@ def scomm(id_num, shared):
                         warn(str(e))
 
         except KeyboardInterrupt as e:
-            shared['left_motor'] = 0.0
-            shared['right_motor'] = 0.0
+            shared['left_motor'].value = 0.0
+            shared['right_motor'].value = 0.0
 
     # will never get here - hopefully things will end up ok if the process is terminated
     s.close()
