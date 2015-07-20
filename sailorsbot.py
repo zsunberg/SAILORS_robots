@@ -61,7 +61,7 @@ class SBot(object):
 
 def scomm(id_num, shared):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
-    ip_addr = '192.168.1.10{}'.format(id_num)
+    ip_addr = '192.168.1.1{:02d}'.format(id_num)
     s.connect((ip_addr, 9750))
     s.settimeout(0.01)
 

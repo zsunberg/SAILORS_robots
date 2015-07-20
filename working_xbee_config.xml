@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<data>
+  <profile>
+    <description_file>XB24-WF-102b.xml</description_file>
+    <settings>
+      <setting command="ID">NETGEAR19</setting>
+      <setting command="AH">2</setting>
+      <setting command="IP">1</setting>
+      <setting command="MA">0</setting>
+      <setting command="TM">A</setting>
+      <setting command="DD">90000</setting>
+      <setting command="NI">0x20</setting>
+      <setting command="DL">192.168.0.1</setting>
+      <setting command="DE">2616</setting>
+      <setting command="C0">2616</setting>
+      <setting command="MY">192.168.1.107</setting>
+      <setting command="MK">255.255.255.0</setting>
+      <setting command="GW">192.168.1.1</setting>
+      <setting command="EE">2</setting>
+      <setting command="PK"></setting>
+      <setting command="AP">0</setting>
+      <setting command="BD">3</setting>
+      <setting command="NB">0</setting>
+      <setting command="SB">0</setting>
+      <setting command="RO">3</setting>
+      <setting command="D6">0</setting>
+      <setting command="D7">1</setting>
+      <setting command="FT">7F3</setting>
+      <setting command="D0">0</setting>
+      <setting command="D1">0</setting>
+      <setting command="D2">0</setting>
+      <setting command="D3">0</setting>
+      <setting command="D4">0</setting>
+      <setting command="D5">1</setting>
+      <setting command="D8">1</setting>
+      <setting command="D9">1</setting>
+      <setting command="P0">0</setting>
+      <setting command="P1">0</setting>
+      <setting command="P2">0</setting>
+      <setting command="P3">1</setting>
+      <setting command="P4">1</setting>
+      <setting command="LT">0</setting>
+      <setting command="PR">7FFF</setting>
+      <setting command="PD">7FFF</setting>
+      <setting command="AV">1</setting>
+      <setting command="M0">0</setting>
+      <setting command="M1">0</setting>
+      <setting command="IC">0</setting>
+      <setting command="IR">0</setting>
+      <setting command="IF">1</setting>
+      <setting command="CT">64</setting>
+      <setting command="GT">3E8</setting>
+      <setting command="CC">2B</setting>
+      <setting command="PL">4</setting>
+      <setting command="BR">0</setting>
+      <setting command="WH">0</setting>
+      <setting command="SO">100</setting>
+      <setting command="SM">0</setting>
+      <setting command="SP">1F4</setting>
+      <setting command="ST">1388</setting>
+    </settings>
+  </profile>
+</data>
