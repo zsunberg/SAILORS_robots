@@ -1,9 +1,7 @@
-//
-//  line_following.py
-//  
-//
-//  Created by Lauren Yang on 7/20/15.
-//
-//
+from sailorsbot import SBot
+from line_follow_functions import follow_segment
 
-import Foundation
+with SBot(3) as car:
+    print "created car"
+    follow_segment(car)
+
