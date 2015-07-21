@@ -2,6 +2,9 @@ from multiprocessing import Process, Value, Pipe, Array
 import socket
 from warnings import warn
 import time
+import sys
+
+from ipdb import set_trace as bp
 
 class SBot(object):
 
@@ -82,7 +85,7 @@ def scomm(id_num, shared):
             if shared['kill_flag'].value != 0:
                 break
 
-            time.sleep(0.2)
+            time.sleep(0.1)
 
             if shared['left_motor'].value != 0.0 or shared['right_motor'].value != 0.0:
                 stopped_with_ctrl_c = False
@@ -101,6 +104,7 @@ def scomm(id_num, shared):
                         if d[1] == ':': # this is data that has a specific meaning
                             if d[0] == 'p': # line position
                                 shared['line_position'].value = float(d[2:])
+                                # print(shared['line_position'].value)
                             elif d[0] == 's': # sensors
                                 vals = [int(v) for v in d[2:].split(',')]
                                 for i in range(len(vals)):
@@ -113,7 +117,7 @@ def scomm(id_num, shared):
                         # warn(str(e))
                         # errors.append(e)
                         if len(errors) >= 5:
-                            warn("5 communication errors:")
+                            warn("{} communication errors:".format(len(errors)))
                             while errors:
                                 print(str(errors.pop(0)))
 
@@ -130,3 +134,7 @@ def scomm(id_num, shared):
 
     send_commands()
     s.close()
+    # sys.stdout.write('waiting for connection to close...')
+    # # sys.stdout.flush()
+    # time.sleep(2)
+    # sys.stdout.write('done\n')
