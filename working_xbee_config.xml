@@ -6,13 +6,13 @@
     <settings>
       <setting command="ID">NETGEAR19</setting>
       <setting command="AH">2</setting>
-      <setting command="IP">1</setting>
+      <setting command="IP">0</setting>
       <setting command="MA">0</setting>
       <setting command="TM">A</setting>
       <setting command="DD">90000</setting>
       <setting command="NI">0x20</setting>
-      <setting command="DL">192.168.0.1</setting>
-      <setting command="DE">2616</setting>
+      <setting command="DL">255.255.255.255</setting>
+      <setting command="DE">25EB</setting>
       <setting command="C0">2616</setting>
       <setting command="MY">192.168.1.107</setting>
       <setting command="MK">255.255.255.0</setting>
