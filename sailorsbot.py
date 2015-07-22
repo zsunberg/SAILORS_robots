@@ -4,7 +4,7 @@ from warnings import warn
 import time
 import sys
 
-from ipdb import set_trace as bp
+#from ipdb import set_trace as bp
 
 MANUAL_MODE = 0;
 LINE_FOLLOWING_MODE = 1;
