@@ -12,7 +12,7 @@ from ipdb import set_trace as bp
 """
 
 
-with SBot(13) as car:
+with SBot(7) as car:
     print "created car"
     follow_segment(car)
 

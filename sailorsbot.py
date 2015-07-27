@@ -101,6 +101,7 @@ def scomm(id_num, shared):
 
         if shared['commanded_mode'].value != shared['reported_mode'].value:
             s.sendto('c:{}\n'.format(shared['commanded_mode'].value), (ip_addr,9750))
+            print('sending mode {}'.format(shared['commanded_mode'].value))
 
         s.sendto('l:{}\n'.format(shared['left_motor'].value), (ip_addr,9750))
         s.sendto('r:{}\n'.format(shared['right_motor'].value), (ip_addr,9750))

@@ -1,5 +1,3 @@
-
-
 """
     
 calculate_shortest_path(name of dictionary containing node information,

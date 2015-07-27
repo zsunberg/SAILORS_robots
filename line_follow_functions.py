@@ -1,11 +1,12 @@
 from sailorsbot import SBot
+import time
 
 #max and min speeds
 MAX = 0.3
 MIN = 0.0
 
 #PID gains
-P_TERM = 1.5
+P_TERM = 0.1
 I_TERM = 0.00
 D_TERM = 0
 
@@ -20,14 +21,16 @@ def follow_segment(car):
     power = 0.0    #speed increase or decrease
     right = 0.0
     left = 0.0
-    speed = MAX
+    speed = 0.1
     
     sensors = car.get_sensors()
     sensors = car.get_sensors()
     sensors = car.get_sensors()
     
     while True:
-        
+
+        time.sleep(0.02)
+
         #gets sensor values and puts into the list
         sensors = car.get_sensors()
         
@@ -36,7 +39,7 @@ def follow_segment(car):
         #   print value
         
         #prints out the line position
-        print car.get_line_position()
+        # car.get_line_position()
         
         #line position
         position = car.get_line_position()
@@ -52,6 +55,8 @@ def follow_segment(car):
         prev_position = position
 
         power = (proportional*P_TERM) + (integral * I_TERM) + (derivative * D_TERM)
+
+        # print power
 
         #new speeds
         right = speed + power
@@ -71,7 +76,6 @@ def follow_segment(car):
         car.set_right_motor(right)
         
 
-        
 """
         if sensors[0] < 1200 and sensors[1] < 1200 and sensors[2] < 1200 and sensors[3] < 1200 and sensors[4] < 1200:
             print"dead end"
