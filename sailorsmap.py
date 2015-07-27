@@ -10,12 +10,14 @@ pointer to optimal
 TODO left, right turning information
 
 json file needs nodes 
+
 {"vertices":
     [
-        {"num":1,
+     ...
+        {"num":2,
          "x":1.2,
          "y":2.3,
-         "north":2
+         "north":3
          "south":3
          "east":4
          "west":5
@@ -56,7 +58,8 @@ class RoadMap(object):
         # add the edges
         for v in vertices:
             for d in ['north', 'east', 'south', 'west']:
-                g.add_edge((v['num'], v[d]))
+                if v[d] is not None:
+                    g.add_edge((v['num'], v[d]))
         assert g.is_directed() == False
 
         # weight the edges by distance
