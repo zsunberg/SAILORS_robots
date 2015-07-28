@@ -19,11 +19,11 @@ class SBot(object):
         self._shared['data_tick'] = Value('l',-1) # incremented every time data is received
         self._shared['left_motor'] = Value('d',0.0)
         self._shared['right_motor'] = Value('d',0.0)
-        self._shared['sensors'] = Array('i', 5*[0])
+        # self._shared['sensors'] = Array('i', 5*[0])
         self._shared['line_position'] = Value('d',0.0)
         self._shared['kill_flag'] = Value('i', 0)
         self._shared['reported_mode'] = Value('i',-1)
-        self._shared['commanded_mode'] = Value('i',MANUAL_MODE)
+        # self._shared['commanded_mode'] = Value('i',MANUAL_MODE)
         self._comm = Process(target=scomm, args=(id_num, self._shared))
         self._comm.start()
 
@@ -44,7 +44,7 @@ class SBot(object):
         self.kill_comm()
 
     def stop(self):
-        self._shared['commanded_mode'].value = MANUAL_MODE
+        self.set_mode(MANUAL_MODE)
         self._shared['left_motor'].value = 0.0        
         self._shared['right_motor'].value = 0.0
 
@@ -52,8 +52,8 @@ class SBot(object):
         self._shared['right_motor'].value = speed
         self._shared['left_motor'].value = speed
 
-    def get_sensors(self):
-        return list(self._shared['sensors'])
+#     def get_sensors(self):
+#         return list(self._shared['sensors'])
 
     def get_line_position(self):
         return self._shared['line_position'].value
@@ -65,7 +65,8 @@ class SBot(object):
         self._shared['right_motor'].value = speed
 
     def set_mode(self, mode):
-        self._shared['commanded_mode'].value = mode
+        # self._shared['commanded_mode'].value = mode
+        self.direct_send('c:{}\n'.format(mode))
 
     def wait_for_manual(self):
         while self._shared['reported_mode'].value != MANUAL_MODE:
@@ -93,15 +94,17 @@ def scomm(id_num, shared):
 
 
     errors = []
-    stopped_with_ctrl_c = False
+    ticks_since_ctrl_c = 10
 
     def send_commands():
         if shared['direct_pipe'].poll():
             s.sendto(shared['direct_pipe'].recv(), (ip_addr,9750))
 
+        '''
         if shared['commanded_mode'].value != shared['reported_mode'].value:
             s.sendto('c:{}\n'.format(shared['commanded_mode'].value), (ip_addr,9750))
             print('sending mode {}'.format(shared['commanded_mode'].value))
+        '''
 
         s.sendto('l:{}\n'.format(shared['left_motor'].value), (ip_addr,9750))
         s.sendto('r:{}\n'.format(shared['right_motor'].value), (ip_addr,9750))
@@ -115,8 +118,11 @@ def scomm(id_num, shared):
 
             time.sleep(0.1)
 
+            '''
             if shared['left_motor'].value != 0.0 or shared['right_motor'].value != 0.0:
-                stopped_with_ctrl_c = False
+                stopped_with_ctrl_c = 0
+            '''
+            ticks_since_ctrl_c += 1
 
             send_commands()
 
@@ -136,10 +142,10 @@ def scomm(id_num, shared):
                             if d[0] == 'p': # line position
                                 shared['line_position'].value = float(d[2:])
                                 # print(shared['line_position'].value)
-                            elif d[0] == 's': # sensors
-                                vals = [int(v) for v in d[2:].split(',')]
-                                for i in range(len(vals)):
-                                    shared['sensors'][i] = vals[i]
+                            # elif d[0] == 's': # sensors
+                            #     vals = [int(v) for v in d[2:].split(',')]
+                            #     for i in range(len(vals)):
+                            #         shared['sensors'][i] = vals[i]
                             elif d[0] == 'm': # mode
                                 shared['reported_mode'].value = int(d[2:])
                             else:
@@ -156,12 +162,12 @@ def scomm(id_num, shared):
 
 
         except KeyboardInterrupt as e:
-            if not stopped_with_ctrl_c:
-                shared['commanded_mode'].value = MANUAL_MODE
+            if ticks_since_ctrl_c > 10:
+                s.sendto('c:{}\n'.format(MANUAL_MODE), (ip_addr,9750))
                 shared['left_motor'].value = 0.0
                 shared['right_motor'].value = 0.0
                 send_commands()
-                stopped_with_ctrl_c = True
+                ticks_since_ctrl_c = 0
             else: # already stopped with ctrl-C
                 send_commands()
                 break
