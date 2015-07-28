@@ -1,0 +1,67 @@
+{
+    "vertices": [
+        {
+            "num": 0,
+            "x": 1,
+            "y": 2,
+            "north": null,
+            "south": null,
+            "east": 1,
+            "west": null
+        },
+        {
+            "num": 1,
+            "x": 4,
+            "y": 2,
+            "north": 3,
+            "south": null,
+            "east": 2,
+            "west": 0
+        },
+        {
+            "num": 2,
+            "x": 6,
+            "y": 2,
+            "north": 3,
+            "south": null,
+            "east": null,
+            "west": 1
+        },
+        {
+            "num": 3,
+            "x": 4,
+            "y": 10,
+            "north": null,
+            "south": 1,
+            "east": 2,
+            "west": null
+        },
+	{
+            "num": 4,
+            "x": 1,
+            "y": 8,
+            "north": null,
+            "south": 0,
+            "east": null,
+            "west": null
+        },
+	{
+            "num": 5,
+            "x": 2,
+            "y": 4,
+            "north": null,
+            "south": null,
+            "east": null,
+            "west": null
+        }
+    ],
+    "curved": [
+        [
+            [
+                2,
+                3
+            ],
+            10
+        ]
+    ]
+}
