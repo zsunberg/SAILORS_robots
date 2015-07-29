@@ -1,11 +1,32 @@
 '''
 A class for representing a road map for sailors - uses igraph under the hood
 
+usage:
+
+    map = RoadMap('file.json')
+
+    map[n] # returns vertex n
+
+    map[1]['best_distance'] = 2.0 # set the 'best_distance' attribute of vertex 1
+
+    map.neighbors(n) # return a list of the neighbors of n
+
+    map[1,2] # return the weight (distance between vertices) between 1 and 2
+
+    for i in map:
+        print i      # print the indices of all of the vertices in the map
+    
+    map.highlight_vertex(2) # will highlight vertex 2 the next time the graph is plotted
+    map.plot() # plots the map using matplotlib
+
+    map.detect_roadblocks() # detects road blocks
+
+
 Each node has a
 number
 x and y location
-value initially set to infinity
-pointer to optimal
+best_distance value initially set to infinity
+pointer to optimal predecessor
 
 TODO left, right turning information
 
@@ -66,7 +87,7 @@ class RoadMap(object):
         for attribute in ['x', 'y', 'north', 'south', 'east', 'west']:
             self.g.vs[attribute] = [v[attribute] for v in vertices]
         self.g.vs['best_distance'] = self.g.vcount()*[float('inf')]
-        self.g.vs['next'] = self.g.vcount()*[None]
+        self.g.vs['predecessor'] = self.g.vcount()*[None]
 
         # add the edges
         for v in vertices:
@@ -89,14 +110,25 @@ class RoadMap(object):
         self.highlighted_vertex = None
         self.highlighted_edge = None
 
-    def set_next(self, vertex, value):
-        """Set the optimal next node to go to."""
-        self.g.vs[vertex]['next'] = value
+    def __getitem__(self, v):
+        """Bracket operator. map[1] gets node 1, map[1,2] gets the edge weight between 1 and 2"""
+        # if only one argument provided, return the vertex
+        if type(v)==int:
+            return self.g.vs[v]
+        else:
+            return self.g[v[0], v[1]]
 
-    def set_best_distance(self, vertex, value):
-        """Set estimate of distance to start."""
-        self.g.vs[vertex]['best_distance'] = value
-    
+    def neighbors(self, v):
+        """Return a list of neighbors."""
+        return list(set(self.g.neighbors(v)))
+
+    def __len__(self):
+        """Return the number of nodes."""
+        return self.g.vcount()
+
+    def __iter__(self):
+        """Allow map to be used in a for loop."""
+        return iter(range(len(self)))
 
     def plot(self):
         def label(xy, text, lowertext):
@@ -127,10 +159,12 @@ class RoadMap(object):
             label([x,y], label_text, label_lower_text)
             #adds coord and title to dictionary
             title_coord[i] = [x,y]
-        circle = mpatches.Circle([self.highlighted_vertex[0],
-                                  self.highlighted_vertex[1]],
-                                 0.5,color='red',hatch = 'o',
-                                 zorder = 9)
+
+        if self.highlighted_vertex is not None:
+            circle = mpatches.Circle([self.highlighted_vertex[0],
+                                      self.highlighted_vertex[1]],
+                                     0.5,color='red',hatch = 'o',
+                                     zorder = 9)
         ax.add_patch(circle)
 
     
@@ -163,6 +197,7 @@ class RoadMap(object):
                 distance = self.g[i,node_name]
                 #adds the distance between the nodes
                 plt.text((x+x2)/2, (y+y2)/2, distance, zorder = 11)
+
             if self.highlighted_edge is not None:
                 ax.arrow(self.highlighted_edge[0],
                          self.highlighted_edge[1],
@@ -176,7 +211,7 @@ class RoadMap(object):
         plt.autoscale(enable=True, axis='both', tight=False)
 
         plt.show()
-        print "done agin"
+        # print "done agin"
         pass
 
     def highlight_vertex(self, vertex):
@@ -203,4 +238,3 @@ if __name__ == "__main__":
     map.highlight_vertex(1)
     map.highlight_edge(0, 1)
     map.plot()
-
