@@ -69,17 +69,17 @@ class SBot(object):
         self.direct_send('c:{}\n'.format(mode))
 
     def wait_for_manual(self):
+        initial_tick = self._shared['data_tick'].value
+        while  self._shared['data_tick'].value < initial_tick + 6:
+            pass
         while self._shared['reported_mode'].value != MANUAL_MODE:
             time.sleep(0.05)
+
 
     def set_gains(self, k_p, k_i, k_d):
         self.direct_send('g:p:{}\n'.format(k_p))
         self.direct_send('g:i:{}\n'.format(k_i))
         self.direct_send('g:d:{}\n'.format(k_d))
-
-
-
-
 
 
 def scomm(id_num, shared):

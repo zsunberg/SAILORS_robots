@@ -12,9 +12,12 @@ output: shortest path: *prints shortest path* cost= *prints shortest distance*
 def calc_shortest_path(graph,start_node,end_node,visited_nodes=[],distances={},predecessors={}):
 
     #checking if the start/end node is in the graph
-    if start_node not in graph:
+    verticelist = ""
+    for i in graph:
+        verticelist = verticelist + str(i)
+    if verticelist.find(str(start_node)) == -1:
         print "start node not in graph!"
-    if end_node not in graph:
+    if verticelist.find(str(end_node)) == -1:
         print "end node not in graph!"
 
     #if the path is built, add the current node to the list of paths and print result
@@ -31,9 +34,9 @@ def calc_shortest_path(graph,start_node,end_node,visited_nodes=[],distances={},p
         if not visited_nodes:
             distances[start_node]=0
         #visits the connected nodes
-        for neighbor in graph[start_node] :
+        for neighbor in graph.neighbors(start_node):
             if neighbor not in visited_nodes:
-                new_distance = distances[start_node] + graph[start_node][neighbor]
+                new_distance = distances[start_node] + graph[start_node,neighbor]
                 
                 #if the current distance is less than the previous distance, and if the node has not been visited before, if the current distance is less than infinity
                 
