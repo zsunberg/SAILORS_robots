@@ -19,7 +19,7 @@ class SBot(object):
         self._shared['data_tick'] = Value('l',-1) # incremented every time data is received
         self._shared['left_motor'] = Value('d',0.0)
         self._shared['right_motor'] = Value('d',0.0)
-        # self._shared['sensors'] = Array('i', 5*[0])
+        self._shared['sensors'] = Array('i', 5*[0])
         self._shared['line_position'] = Value('d',0.0)
         self._shared['kill_flag'] = Value('i', 0)
         self._shared['reported_mode'] = Value('i',-1)
@@ -52,8 +52,8 @@ class SBot(object):
         self._shared['right_motor'].value = speed
         self._shared['left_motor'].value = speed
 
-#     def get_sensors(self):
-#         return list(self._shared['sensors'])
+    def get_sensors(self):
+        return list(self._shared['sensors'])
 
     def get_line_position(self):
         return self._shared['line_position'].value
@@ -70,8 +70,11 @@ class SBot(object):
 
     def wait_for_manual(self):
         initial_tick = self._shared['data_tick'].value
-        while  self._shared['data_tick'].value < initial_tick + 6:
+        while  self._shared['data_tick'].value < initial_tick + 1:
             pass
+        if self._shared['reported_mode'].value == MANUAL_MODE:
+            print "immediately found manual mode"
+            return None
         while self._shared['reported_mode'].value != MANUAL_MODE:
             time.sleep(0.05)
 
@@ -131,7 +134,7 @@ def scomm(id_num, shared):
                 data = s.recv(1024)
             except socket.timeout, e:
                 pass
-            
+
             if data is not None:
                 with shared['data_tick'].get_lock():
                     shared['data_tick'].value += 1
@@ -142,10 +145,10 @@ def scomm(id_num, shared):
                             if d[0] == 'p': # line position
                                 shared['line_position'].value = float(d[2:])
                                 # print(shared['line_position'].value)
-                            # elif d[0] == 's': # sensors
-                            #     vals = [int(v) for v in d[2:].split(',')]
-                            #     for i in range(len(vals)):
-                            #         shared['sensors'][i] = vals[i]
+                            elif d[0] == 's': # sensors
+                                vals = [int(v) for v in d[2:].split(',')]
+                                for i in range(len(vals)):
+                                    shared['sensors'][i] = vals[i]
                             elif d[0] == 'm': # mode
                                 shared['reported_mode'].value = int(d[2:])
                             else:
