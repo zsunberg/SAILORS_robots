@@ -151,7 +151,7 @@ class RoadMap(object):
             xcoord.append(x)
             ycoord.append(y)
             #plots it
-            circle = mpatches.Circle([x,y],0.5,color='yellow',hatch = '*', zorder = 3)
+            circle = mpatches.Circle([x,y],0.15,color='yellow',hatch = '*', zorder = 3)
             ax.add_patch(circle)
             #labels the node
             label_text = str(i)
@@ -163,7 +163,7 @@ class RoadMap(object):
         if self.highlighted_vertex is not None:
             circle = mpatches.Circle([self.highlighted_vertex[0],
                                       self.highlighted_vertex[1]],
-                                     0.5,color='red',hatch = 'o',
+                                     0.15,color='red',hatch = 'o',
                                      zorder = 9)
         ax.add_patch(circle)
 
