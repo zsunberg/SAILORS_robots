@@ -72,17 +72,20 @@ class SBot(object):
             pass
 
     def wait_for_manual(self):
+        initial_tick = self._shared['data_tick'].value
+        while  self._shared['data_tick'].value < initial_tick + 1:
+            pass
+        if self._shared['reported_mode'].value == MANUAL_MODE:
+            print "immediately found manual mode"
+            return None
         while self._shared['reported_mode'].value != MANUAL_MODE:
             time.sleep(0.02)
+
 
     def set_gains(self, k_p, k_i, k_d):
         self.direct_send('g:p:{}\n'.format(k_p))
         self.direct_send('g:i:{}\n'.format(k_i))
         self.direct_send('g:d:{}\n'.format(k_d))
-
-
-
-
 
 
 def scomm(id_num, shared):
@@ -134,7 +137,7 @@ def scomm(id_num, shared):
                 data = s.recv(1024)
             except socket.timeout, e:
                 pass
-            
+
             if data is not None:
                 with shared['data_tick'].get_lock():
                     shared['data_tick'].value += 1
