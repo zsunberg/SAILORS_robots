@@ -28,10 +28,7 @@ x and y location
 best_distance value initially set to infinity
 pointer to optimal predecessor
 
-TODO left, right turning information
-
-json file needs nodes 
-
+json file looks like:
 {"vertices":
     [
      ...
@@ -61,9 +58,13 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.collections import PatchCollection
 import numpy as np
+import time
+import socket
+
+plt.ion()
 
 class RoadMap(object):
-    def __init__(self, input_file='sailorsmaptest.txt'):
+    def __init__(self, input_file='map_in_ASL.json'):
         
         
         with open(input_file) as file:
@@ -109,6 +110,7 @@ class RoadMap(object):
 
         self.highlighted_vertex = None
         self.highlighted_edge = None
+        self.detected_cars = dict()
 
     def __getitem__(self, v):
         """Bracket operator. map[1] gets node 1, map[1,2] gets the edge weight between 1 and 2"""
@@ -131,13 +133,14 @@ class RoadMap(object):
         return iter(range(len(self)))
 
     def plot(self):
+        plt.clf()
         def label(xy, text, lowertext):
-            y = xy[1] - 0.15 # shift y-value for label so that it's below the artist
+            y = xy[1] -.05 # shift y-value for label so that it's below the artist
             plt.text(xy[0], y, text, ha="center", family='sans-serif', size=14, zorder = 15)
-            y = xy[1] - 0.75 # shift y-value for label so that it's below the artist
+            y = xy[1] - 0.3 # shift y-value for label so that it's below the artist
             plt.text(xy[0], y, lowertext, ha="center", family='sans-serif', size=8)
         """Plot the graph."""
-        fig, ax = plt.subplots()
+        ax = plt.gca()
         # fig, ax = plt.subplots()
         xcoord = []
         ycoord = []
@@ -210,6 +213,16 @@ class RoadMap(object):
         plt.gca().set_aspect('equal', adjustable='box')
         plt.autoscale(enable=True, axis='both', tight=False)
 
+        # plot cars
+        for key in self.detected_cars:
+            car = mpatches.Rectangle(xy=self.detected_cars[key],
+                                     width=.1, height=.1,
+                                     angle=45, color='green')
+            plt.text(self.detected_cars[key][0],
+                     self.detected_cars[key][1],
+                     str(key))
+            ax.add_patch(car)
+
         plt.show()
         # print "done agin"
         pass
@@ -232,6 +245,35 @@ class RoadMap(object):
         y2 = dict['y']
         self.highlighted_edge = [x,y,x2,y2]
         pass
+
+    def detect_cars(self, timeout=1):
+        self.detected_cars = dict()
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.bind(('', 1930))
+            s.settimeout(timeout)
+            start = time.time()
+
+            while time.time() < start + timeout:
+                data = s.recv(1024)
+                for d in data.split('\n'):
+                    parts = d.split(':')
+                    if parts[0] == 'c':
+                        # convert to feet
+                        self.detected_cars[int(parts[1])] = [float(x)*3.28 for x in parts[3].split(',')[0:2]]
+                        # print "got one"
+                    elif d[0] == '\x00':
+                        # don't understand what this is
+                        pass
+                    else:
+                        print parts
+
+        except socket.timeout as e:
+            print(e)
+            print("Didn't get any data from Vicon.")
+
+        finally:
+            s.close()
 
 if __name__ == "__main__":
     map = RoadMap()

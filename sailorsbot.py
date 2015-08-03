@@ -69,7 +69,7 @@ class SBot(object):
         self.direct_send('c:{}\n'.format(mode))
         # return only when the mode has been acknowledged
         while self._shared['reported_mode'].value != mode:
-            time.sleep(0.02)
+            pass
 
     def wait_for_manual(self):
         while self._shared['reported_mode'].value != MANUAL_MODE:
