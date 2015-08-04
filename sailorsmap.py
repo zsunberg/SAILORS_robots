@@ -146,6 +146,17 @@ class RoadMap(object):
         ycoord = []
         title_coord = {}
         patches = []
+
+        # plot cars
+        for key in self.detected_cars:
+            car = mpatches.Rectangle(xy=self.detected_cars[key],
+                                     width=.1, height=.1,
+                                     angle=45, color='green')
+            plt.text(self.detected_cars[key][0],
+                     self.detected_cars[key][1],
+                     str(key))
+            ax.add_patch(car)
+
         for i in range(self.g.vcount()):
             #gets the x and y coordinates
             dict = self.g.vs[i].attributes()
@@ -212,16 +223,6 @@ class RoadMap(object):
         #plt.plot(xcoord, ycoord)
         plt.gca().set_aspect('equal', adjustable='box')
         plt.autoscale(enable=True, axis='both', tight=False)
-
-        # plot cars
-        for key in self.detected_cars:
-            car = mpatches.Rectangle(xy=self.detected_cars[key],
-                                     width=.1, height=.1,
-                                     angle=45, color='green')
-            plt.text(self.detected_cars[key][0],
-                     self.detected_cars[key][1],
-                     str(key))
-            ax.add_patch(car)
 
         plt.show()
         # print "done agin"

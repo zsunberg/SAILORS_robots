@@ -1,4 +1,4 @@
-from multiprocessing import Process, Value, Pipe, Array
+from multiprocessing import Process, Value, Pipe, Array, Queue
 import socket
 from warnings import warn
 import time
@@ -23,9 +23,12 @@ class SBot(object):
         self._shared['line_position'] = Value('d',0.0)
         self._shared['kill_flag'] = Value('i', 0)
         self._shared['reported_mode'] = Value('i',-1)
+        self._shared['mode_ack_time'] = Value('d', 0.0)
+        # self._shared['acknowledged'] = self._manager.dict()
         # self._shared['commanded_mode'] = Value('i',MANUAL_MODE)
         self._comm = Process(target=scomm, args=(id_num, self._shared))
         self._comm.start()
+        time.sleep(1)
 
     def direct_send(self, string):
         self.direct_pipe.send(string)
@@ -44,7 +47,7 @@ class SBot(object):
         self.kill_comm()
 
     def stop(self):
-        self.set_mode(MANUAL_MODE)
+        self.set_mode(MANUAL_MODE, wait_for_ack=False)
         self._shared['left_motor'].value = 0.0        
         self._shared['right_motor'].value = 0.0
 
@@ -64,23 +67,16 @@ class SBot(object):
     def set_right_motor(self, speed):
         self._shared['right_motor'].value = speed
 
-    def set_mode(self, mode):
-        # self._shared['commanded_mode'].value = mode
+    def set_mode(self, mode, wait_for_ack=True):
+        last_time = self._shared['mode_ack_time'].value
         self.direct_send('c:{}\n'.format(mode))
-        # return only when the mode has been acknowledged
-        while self._shared['reported_mode'].value != mode:
-            pass
+        if wait_for_ack:
+            while self._shared['mode_ack_time'].value <= last_time:
+                time.sleep(0.02)
 
     def wait_for_manual(self):
-        initial_tick = self._shared['data_tick'].value
-        while  self._shared['data_tick'].value < initial_tick + 1:
-            pass
-        if self._shared['reported_mode'].value == MANUAL_MODE:
-            print "immediately found manual mode"
-            return None
         while self._shared['reported_mode'].value != MANUAL_MODE:
             time.sleep(0.02)
-
 
     def set_gains(self, k_p, k_i, k_d):
         self.direct_send('g:p:{}\n'.format(k_p))
@@ -154,17 +150,22 @@ def scomm(id_num, shared):
                                     shared['sensors'][i] = vals[i]
                             elif d[0] == 'm': # mode
                                 shared['reported_mode'].value = int(d[2:])
+                            elif d[0] == 'a': # acknowledgement
+                                if d[2] == 'c':
+                                    shared['reported_mode'].value = int(d[4:])
+                                    shared['mode_ack_time'].value = time.time()
                             else:
                                 print(d)
                         else:
                             print(d)
                     except (IndexError, ValueError) as e:
-                        # warn(str(e))
+                        if len(d) > 0:
+                            warn(str(e)+'\ndata was "{}"'.format(d))
                         # errors.append(e)
-                        if len(errors) >= 5:
-                            warn("{} communication errors:".format(len(errors)))
-                            while errors:
-                                print(str(errors.pop(0)))
+                        # if len(errors) >= 5:
+                        #     warn("{} communication errors:".format(len(errors)))
+                        #     while errors:
+                        #         print(str(errors.pop(0)))
 
 
         except KeyboardInterrupt as e:
