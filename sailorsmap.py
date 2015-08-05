@@ -61,7 +61,7 @@ import numpy as np
 import time
 import socket
 
-plt.ion()
+#plt.ion()
 
 class RoadMap(object):
     def __init__(self, input_file='map_in_ASL.json'):
@@ -136,7 +136,7 @@ class RoadMap(object):
         plt.clf()
         def label(xy, text, lowertext):
             y = xy[1] -.05 # shift y-value for label so that it's below the artist
-            plt.text(xy[0], y, text, ha="center", family='sans-serif', size=14, zorder = 15)
+            plt.text(xy[0], y, text, ha="center", family='sans-serif', size=8, zorder = 15)
             y = xy[1] - 0.3 # shift y-value for label so that it's below the artist
             plt.text(xy[0], y, lowertext, ha="center", family='sans-serif', size=8)
         """Plot the graph."""
@@ -203,14 +203,14 @@ class RoadMap(object):
             for k in range(len(neighbor_list)):
                 node_name = neighbor_list[k]
                 temp = title_coord.get(node_name)
-                x2 = temp[0]
-                y2 = temp[1]
+                x2 = temp[0]+0.0
+                y2 = temp[1]+0.0
                 #adds the lines
                 ax.arrow(x, y, x2-x, y2-y, color = 'pink',zorder = 1)
                 #gets the distance
                 distance = self.g[i,node_name]
                 #adds the distance between the nodes
-                plt.text((x+x2)/2, (y+y2)/2, distance, zorder = 11)
+                plt.text((x+x2)/2.0, (y+y2)/2.0, distance,size=5,zorder = 11)
 
             if self.highlighted_edge is not None:
                 ax.arrow(self.highlighted_edge[0],
