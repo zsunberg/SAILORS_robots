@@ -8,6 +8,7 @@ import sys
 
 MANUAL_MODE = 0;
 LINE_FOLLOWING_MODE = 1;
+TURN_MODE = 2;
 
 class SBot(object):
 
@@ -71,8 +72,18 @@ class SBot(object):
         last_time = self._shared['mode_ack_time'].value
         self.direct_send('c:{}\n'.format(mode))
         if wait_for_ack:
-            while self._shared['mode_ack_time'].value <= last_time:
+            while self._shared['mode_ack_time'].value <= last_time and self._shared['reported_mode'].value != mode:
                 time.sleep(0.02)
+
+    def turn(self, direction):
+        last_time = self._shared['mode_ack_time'].value
+        self.direct_send('t:{}\n'.format(direction))
+        while self._shared['mode_ack_time'].value <= last_time and self._shared['reported_mode'].value != TURN_MODE:
+            time.sleep(0.02)
+
+    def nudge(self, duration):
+        self.direct_send("n:{}\n".format(duration))
+        time.sleep(duration+0.2)
 
     def wait_for_manual(self):
         while self._shared['reported_mode'].value != MANUAL_MODE:
@@ -97,16 +108,11 @@ def scomm(id_num, shared):
 
     errors = []
     ticks_since_ctrl_c = 10
+    leftovers = ''
 
     def send_commands():
         if shared['direct_pipe'].poll():
             s.sendto(shared['direct_pipe'].recv(), (ip_addr,9750))
-
-        '''
-        if shared['commanded_mode'].value != shared['reported_mode'].value:
-            s.sendto('c:{}\n'.format(shared['commanded_mode'].value), (ip_addr,9750))
-            print('sending mode {}'.format(shared['commanded_mode'].value))
-        '''
 
         s.sendto('l:{}\n'.format(shared['left_motor'].value), (ip_addr,9750))
         s.sendto('r:{}\n'.format(shared['right_motor'].value), (ip_addr,9750))
@@ -130,7 +136,7 @@ def scomm(id_num, shared):
 
             data = None
             try:
-                data = s.recv(1024)
+                data = leftovers + s.recv(1024)
             except socket.timeout, e:
                 pass
 
@@ -138,6 +144,9 @@ def scomm(id_num, shared):
                 with shared['data_tick'].get_lock():
                     shared['data_tick'].value += 1
 
+                leftover_begin = data.rfind('\n')+1
+                leftovers = data[leftover_begin:]
+                data = data[:leftover_begin]
                 for d in data.split('\n'):
                     try:
                         if d[1] == ':': # this is data that has a specific meaning

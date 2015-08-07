@@ -38,6 +38,7 @@ def plot_proc(shared, varname, window):
 
             plt.cla()
             plt.plot([t-current for t in times[min_index:]], values[min_index:])
+            plt.grid()
             plt.pause(0.01)
 
             if times[0] < current-2*window:
