@@ -5,7 +5,7 @@ usage:
 
     map = RoadMap('file.json')
 
-    map[n] # returns vertex n
+    map[n] # returns dictionary-like object with all the properties of node n
 
     map[1]['best_distance'] = 2.0 # set the 'best_distance' attribute of vertex 1
 
