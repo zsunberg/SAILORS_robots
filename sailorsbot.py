@@ -15,18 +15,13 @@ class SBot(object):
     def __init__(self, id_num):
         self.id_num = id_num
         self._shared = dict()
-        # self._shared['direct_pipe'], self.direct_pipe = Pipe(False)
         self._shared['direct_pipe'], self.direct_pipe = Pipe(False)
         self._shared['data_tick'] = Value('l',-1) # incremented every time data is received
-        # self._shared['left_motor'] = Value('d',0.0)
-        # self._shared['right_motor'] = Value('d',0.0)
         self._shared['sensors'] = Array('i', 5*[0])
         self._shared['line_position'] = Value('d',0.0)
         self._shared['kill_flag'] = Value('i', 0)
         self._shared['reported_mode'] = Value('i',-1)
         self._shared['mode_ack_time'] = Value('d', 0.0)
-        # self._shared['acknowledged'] = self._manager.dict()
-        # self._shared['commanded_mode'] = Value('i',MANUAL_MODE)
         self._comm = Process(target=scomm, args=(id_num, self._shared))
         self._comm.start()
         time.sleep(1)
@@ -51,14 +46,10 @@ class SBot(object):
         self.set_mode(MANUAL_MODE, wait_for_ack=False)
         self.direct_send('l:0.0\n')
         self.direct_send('r:0.0\n')
-        # self._shared['left_motor'].value = 0.0        
-        # self._shared['right_motor'].value = 0.0
 
     def forward(self, speed):
         self.direct_send('l:{}\n'.format(speed))
         self.direct_send('r:{}\n'.format(speed))
-        # self._shared['right_motor'].value = speed
-        # self._shared['left_motor'].value = speed
 
     def get_sensors(self):
         return list(self._shared['sensors'])
