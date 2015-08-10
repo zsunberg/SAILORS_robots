@@ -133,13 +133,13 @@ class RoadMap(object):
         return iter(range(len(self)))
 
     def plot(self):
+        """Plot the graph."""
         plt.clf()
         def label(xy, text, lowertext):
             y = xy[1] -.05 # shift y-value for label so that it's below the artist
             plt.text(xy[0], y, text, ha="center", family='sans-serif', size=8, zorder = 15)
             y = xy[1] - 0.3 # shift y-value for label so that it's below the artist
-            plt.text(xy[0], y, lowertext, ha="center", family='sans-serif', size=8)
-        """Plot the graph."""
+            # plt.text(xy[0], y, lowertext, ha="center", family='sans-serif', size=8)
         ax = plt.gca()
         # fig, ax = plt.subplots()
         xcoord = []
@@ -210,7 +210,7 @@ class RoadMap(object):
                 #gets the distance
                 distance = self.g[i,node_name]
                 #adds the distance between the nodes
-                plt.text((x+x2)/2.0, (y+y2)/2.0, distance,size=5,zorder = 11)
+                plt.text((x+x2)/2.0, (y+y2)/2.0, distance,size=8,zorder = 11)
 
             if self.highlighted_edge is not None:
                 ax.arrow(self.highlighted_edge[0],
