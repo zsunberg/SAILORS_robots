@@ -47,7 +47,10 @@ json file looks like:
         [[1,2],14.7],
      ...   
     ]
+ "passthrough": [3]
 }
+
+(passthrough are nodes that will be passed through without stopping)
 '''
 
 import igraph
@@ -89,6 +92,10 @@ class RoadMap(object):
             self.g.vs[attribute] = [v[attribute] for v in vertices]
         self.g.vs['best_distance'] = self.g.vcount()*[float('inf')]
         self.g.vs['predecessor'] = self.g.vcount()*[None]
+        self.g.vs['passthrough'] = self.g.vcount()*[False]
+
+        for v in graph_dict['passthrough']:
+            self.g.vs[v]['passthrough'] = True
 
         # add the edges
         for v in vertices:
@@ -109,7 +116,7 @@ class RoadMap(object):
             self.g[c[0][0], c[0][1]] = c[1]
 
         self.highlighted_vertex = None
-        self.highlighted_edge = None
+        self.highlighted_edges = []
         self.detected_cars = dict()
 
     def __getitem__(self, v):
@@ -212,11 +219,11 @@ class RoadMap(object):
                 #adds the distance between the nodes
                 plt.text((x+x2)/2.0, (y+y2)/2.0, distance,size=8,zorder = 11)
 
-            if self.highlighted_edge is not None:
-                ax.arrow(self.highlighted_edge[0],
-                         self.highlighted_edge[1],
-                         self.highlighted_edge[2] - self.highlighted_edge[0],
-                         self.highlighted_edge[3] - self.highlighted_edge[1],
+            for e in self.highlighted_edges:
+                ax.arrow(e[0],
+                         e[1],
+                         e[2] - e[0],
+                         e[3] - e[1],
                          color = 'blue',zorder = 2)
 
         #graphs/displays the plot
@@ -226,7 +233,6 @@ class RoadMap(object):
 
         plt.show()
         # print "done agin"
-        pass
 
     def highlight_vertex(self, vertex):
         """Highlight a vertex when the graph is plotted."""
@@ -234,7 +240,6 @@ class RoadMap(object):
         x = dict['x']
         y = dict['y']
         self.highlighted_vertex = [x,y]
-        pass
 
     def highlight_edge(self, v1, v2):
         """Highlight an edge when the graph is plotted."""
@@ -244,8 +249,14 @@ class RoadMap(object):
         dict = self.g.vs[v2].attributes()
         x2 = dict['x']
         y2 = dict['y']
-        self.highlighted_edge = [x,y,x2,y2]
-        pass
+        self.highlighted_edges += [[x,y,x2,y2]]
+
+    def highlight_path(self, vertex_sequence):
+        for i in range(1,len(vertex_sequence)):
+            self.highlight_edge(vertex_sequence[i-1],vertex_sequence[i])
+
+    def clear_highlighted_edges(self):
+        self.highlighted_edges = []
 
     def detect_cars(self, timeout=1):
         self.detected_cars = dict()

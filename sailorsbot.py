@@ -142,9 +142,6 @@ def scomm(id_num, shared):
             if shared['kill_flag'].value != 0:
                 break
 
-
-            time.sleep(0.05)
-
             ticks_since_ctrl_c += 1
 
             try:
