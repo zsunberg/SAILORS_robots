@@ -55,14 +55,15 @@ json file looks like:
 
 import igraph
 import json
-import math
 import pdb
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.collections import PatchCollection
 import numpy as np
+from numpy.linalg import norm
 import time
 import socket
+from math import sqrt, acos, sin
 
 #plt.ion()
 
@@ -100,7 +101,7 @@ class RoadMap(object):
         # add the edges
         for v in vertices:
             for d in ['north', 'east', 'south', 'west']:
-                if v[d] is not None:
+                if v[d] is not None and self.g[v['num'], v[d]]==0:
                     self.g.add_edge(v['num'], v[d])
         assert self.g.is_directed() == False
 
@@ -109,7 +110,7 @@ class RoadMap(object):
         for e in self.g.es:
             v1 = self.g.vs[e.source]
             v2 = self.g.vs[e.target]
-            e['weight'] = math.sqrt((v1['x']-v2['x'])**2
+            e['weight'] = sqrt((v1['x']-v2['x'])**2
                                + (v1['y']-v2['y'])**2)
         # set the curved ones
         for c in graph_dict['curved']:
@@ -127,9 +128,43 @@ class RoadMap(object):
         else:
             return self.g[v[0], v[1]]
 
+    def __setitem__(self, vs, weight):
+        self.g[vs[0], vs[1]] = weight
+
     def neighbors(self, v):
         """Return a list of neighbors."""
         return list(set(self.g.neighbors(v)))
+
+    def nearest_edge(self, xy):
+        """Return a tuple describing the point an edge is nearest to"""
+        distances = len(self.g.es)*[None]
+        for i in range(len(self.g.es)):
+            # a, b, and c are the lengths of the sides of the triangle
+            e = self.g.es[i]
+            t = self[e.target]
+            t_xy = np.array([t['x'], t['y']])
+            s = self[e.source]
+            s_xy = np.array([s['x'], s['y']])
+            t_dist = norm(t_xy - np.array(xy))
+            s_dist = norm(s_xy - np.array(xy))
+            a = max(t_dist,s_dist)
+            b = min(t_dist,s_dist)
+            c = norm(t_xy - s_xy)
+            if a > sqrt(b**2+c**2): # outside of span
+                distances[i] = b
+            else:
+                distances[i] = a*sin(acos((a**2+c**2-b**2)/(2*a*c)))
+        min_dist=float('inf')
+        min_ind=None
+        for i in range(len(self.g.es)):
+            if distances[i] < min_dist:
+                min_dist = distances[i]
+                min_ind = i
+        e = self.g.es[min_ind]
+        return (e.source, e.target)
+
+    def delete_edge(self, node_pair):
+        self.g.delete_edges([node_pair])
 
     def __len__(self):
         """Return the number of nodes."""
@@ -190,23 +225,12 @@ class RoadMap(object):
 
     
         for i in range(self.g.vcount()):
-            neighbor_list = []
+            neighbor_list = self.neighbors(i)
             dict = self.g.vs[i].attributes()
             #gets the current x and y coordinates
             x = dict.get('x')
             y = dict.get('y')
             
-            #gets the neighbors
-            if dict['north'] is not None:
-                neighbor_list.append(dict['north'])
-            if dict['south'] is not None:
-                neighbor_list.append(dict['south'])
-            if dict['east'] is not None:
-                neighbor_list.append(dict['east'])
-            if dict['west'] is not None:
-                neighbor_list.append(dict['west'])
-           
-           
             for k in range(len(neighbor_list)):
                 node_name = neighbor_list[k]
                 temp = title_coord.get(node_name)
