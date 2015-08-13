@@ -19,7 +19,11 @@ usage:
     map.highlight_vertex(2) # will highlight vertex 2 the next time the graph is plotted
     map.plot() # plots the map using matplotlib
 
-    map.detect_roadblocks() # detects road blocks
+    map.detect_cars() # detects road blocks
+
+    # other
+    map.delete_edge((1,2))
+    map.nearest_edge(xy)
 
 
 Each node has a
