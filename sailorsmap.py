@@ -140,7 +140,7 @@ class RoadMap(object):
         return list(set(self.g.neighbors(v)))
 
     def nearest_edge(self, xy):
-        """Return a tuple describing the point an edge is nearest to"""
+        """Return a tuple describing the edge a point is nearest to"""
         distances = len(self.g.es)*[None]
         for i in range(len(self.g.es)):
             # a, b, and c are the lengths of the sides of the triangle
