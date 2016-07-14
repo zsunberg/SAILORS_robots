@@ -95,6 +95,9 @@ class SBot(object):
         self.direct_send('g:i:{}\n'.format(k_i))
         self.direct_send('g:d:{}\n'.format(k_d))
 
+    def set_pid_speed(self, speed):
+        self.direct_send('g:s:{}\n'.format(speed))
+
 
 def scomm(id_num, shared):
 
