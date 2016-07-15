@@ -74,7 +74,6 @@ from math import sqrt, acos, sin
 class RoadMap(object):
     def __init__(self, input_file='map_in_ASL.json'):
         
-        
         with open(input_file) as file:
             input = file.read()
 
@@ -99,7 +98,7 @@ class RoadMap(object):
         self.g.vs['predecessor'] = self.g.vcount()*[None]
         self.g.vs['passthrough'] = self.g.vcount()*[False]
 
-        for v in graph_dict['passthrough']:
+        for v in graph_dict.get('passthrough', []):
             self.g.vs[v]['passthrough'] = True
 
         # add the edges

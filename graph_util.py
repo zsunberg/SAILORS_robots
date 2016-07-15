@@ -1,4 +1,3 @@
-
 turn_dict = {'north':{'north':'s',
                       'east':'r',
                       'west':'l'},
