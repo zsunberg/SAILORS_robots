@@ -5,8 +5,6 @@ usage:
 
     map = RoadMap('file.json')
 
-    map[n] # returns dictionary-like object with all the properties of node n
-
     map.neighbors(n) # return a list of the neighbors of n
 
     map[1,2] # return the weight (distance between vertices) between 1 and 2
@@ -16,6 +14,8 @@ usage:
     
     map.highlight_vertex(2) # will highlight vertex 2 the next time the graph is plotted
     map.plot() # plots the map using matplotlib
+
+    map[n] # returns dictionary-like object with all the properties of node n
 
     map.detect_cars() # detects road blocks
 
@@ -162,6 +162,16 @@ class RoadMap(object):
 
     def delete_edge(self, node_pair):
         self.g.delete_edges([node_pair])
+
+    def nearest_vertex(self, xy):
+        min_dist_squared = float('inf')
+        min_ind = None
+        for i in self:
+            dist_squared = (xy[0]-self[i]['x'])**2 + (xy[1]-self[i]['y'])**2
+            if dist_squared < min_dist_squared:
+                min_dist_squared = dist_squared
+                min_ind = i
+        return min_ind
 
     def __len__(self):
         """Return the number of nodes."""
