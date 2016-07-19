@@ -47,8 +47,12 @@ def turns(graph, vertex_sequence):
     return t
 
 def orientation_turns(graph, current_vertex, current_direction, next_vertex):
-    """Return a string consisting of 'r', 'l', or 'll' of turns to be executed in-place to orient correctly to begin a sequence of turns."""
+    """Return a string consisting of 'r', 'l', or 'll' or '' of turns to be executed in-place to orient correctly to begin a sequence of turns."""
     next_dir = outgoing_direction(graph, current_vertex, next_vertex)
     if opposite_dir[current_direction] == next_dir:
         return 'll'
-    return turn_dict[current_direction][next_dir]
+    turn = turn_dict[current_direction][next_dir]
+    if turn == 's':
+        return ''
+    else:
+        return turn
