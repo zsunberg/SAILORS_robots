@@ -7,8 +7,6 @@ usage:
 
     map[n] # returns dictionary-like object with all the properties of node n
 
-    map[1]['best_distance'] = 2.0 # set the 'best_distance' attribute of vertex 1
-
     map.neighbors(n) # return a list of the neighbors of n
 
     map[1,2] # return the weight (distance between vertices) between 1 and 2
@@ -29,8 +27,6 @@ usage:
 Each node has a
 number
 x and y location
-best_distance value initially set to infinity
-pointer to optimal predecessor
 
 json file looks like:
 {"vertices":
@@ -94,8 +90,6 @@ class RoadMap(object):
         self.g.add_vertices(len(vertices))
         for attribute in ['x', 'y', 'north', 'south', 'east', 'west']:
             self.g.vs[attribute] = [v[attribute] for v in vertices]
-        self.g.vs['best_distance'] = self.g.vcount()*[float('inf')]
-        self.g.vs['predecessor'] = self.g.vcount()*[None]
         self.g.vs['passthrough'] = self.g.vcount()*[False]
 
         for v in graph_dict.get('passthrough', []):
@@ -180,7 +174,7 @@ class RoadMap(object):
     def plot(self):
         """Plot the graph."""
         plt.clf()
-        def label(xy, text, lowertext):
+        def label(xy, text):
             y = xy[1] -.05 # shift y-value for label so that it's below the artist
             plt.text(xy[0], y, text, ha="center", family='sans-serif', size=8, zorder = 15)
             y = xy[1] - 0.3 # shift y-value for label so that it's below the artist
@@ -214,8 +208,7 @@ class RoadMap(object):
             ax.add_patch(circle)
             #labels the node
             label_text = str(i)
-            label_lower_text = self.g.vs[i]['best_distance']
-            label([x,y], label_text, label_lower_text)
+            label([x,y], label_text)
             #adds coord and title to dictionary
             title_coord[i] = [x,y]
 
