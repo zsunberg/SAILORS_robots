@@ -14,7 +14,7 @@
       <setting command="DL">255.255.255.255</setting>
       <setting command="DE">25EB</setting>
       <setting command="C0">2616</setting>
-      <setting command="MY">192.168.1.107</setting>
+      <setting command="MY">192.168.1.104</setting>
       <setting command="MK">0.0.0.0</setting>
       <setting command="GW">192.168.1.1</setting>
       <setting command="EE">2</setting>
