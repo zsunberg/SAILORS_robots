@@ -7,4 +7,4 @@ import time
 graph = RoadMap('map_in_ASL.json')
 while True:
     graph.detect_cars()
-    print graph.detect_cars
+    print graph.detected_cars
