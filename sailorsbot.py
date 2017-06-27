@@ -104,8 +104,11 @@ def scomm(id_num, shared):
     def setup_connection():
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
-            ip_addr = '192.168.1.1{:02d}'.format(id_num)
+            ip_addr = '192.168.0.1{:02d}'.format(id_num)
             s.connect((ip_addr, 9750))
+            # ip_addr = '192.168.1.15'
+            # ip_addr = '192.168.0.1'
+            # s.connect((ip_addr, 17003))
             s.settimeout(0.01)
         except socket.error as e:
             print e
