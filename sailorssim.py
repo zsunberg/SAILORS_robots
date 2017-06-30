@@ -5,8 +5,7 @@ from numpy.random import randn
 from IPython.display import HTML
 
 # f should return leftspeed, rightspeed
-def simulate(f, speed=0.3,
-                loop_dt=1/20.,
+def simulate(f, loop_dt=1/20.,
                 end=2.0,
                 state=(0.0, -0.02, -0.01),
                 sensor_lag=0.045,
@@ -23,7 +22,7 @@ def simulate(f, speed=0.3,
     times = [time]
     next_ctrl = time + loop_dt
     next_sense = next_ctrl - sensor_lag
-    speeds = (speed, speed)
+    speeds = f(line_position, prev_line_position)
 
     while time < end:
 
@@ -39,7 +38,7 @@ def simulate(f, speed=0.3,
             next_sense += loop_dt
 
         if time == next_ctrl:
-            speeds = f(speed, line_position, prev_line_position)
+            speeds = f(line_position, prev_line_position)
             speeds = (speeds[0]+left_wheel_bias, speeds[1])
             states.append(state)
             line_positions.append(line_position)
