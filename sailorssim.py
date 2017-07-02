@@ -5,24 +5,23 @@ from numpy.random import randn
 from IPython.display import HTML
 
 # f should return leftspeed, rightspeed
-def simulate(f, loop_dt=1/20.,
+def simulate(f, loop_dt=0.02,
                 end=2.0,
                 state=(0.0, -0.02, -0.01),
-                sensor_lag=0.045,
+                sensor_lag=0.023,
                 left_wheel_bias=0.0,
                 output='animate'):
 
-    assert sensor_lag <= loop_dt
+    assert sensor_lag < 2*loop_dt # tricky to have larger sensor lag - don't want to support
 
+    spool = SensorSpool(loop_dt, sensor_lag, measure(state))
     states = [state]
-    line_position = measure(state)
-    prev_line_position = measure(state)
-    line_positions = [line_position]
+    line_positions = [measure(state)]
     time = 0.0
     times = [time]
     next_ctrl = time + loop_dt
-    next_sense = next_ctrl - sensor_lag
-    speeds = f(line_position, prev_line_position)
+    next_sense = min(0.0, next_ctrl - sensor_lag)
+    speeds = f(measure(state), measure(state))
 
     while time < end:
 
@@ -33,11 +32,17 @@ def simulate(f, loop_dt=1/20.,
         time = min(next_ctrl, next_sense)
 
         if time == next_sense:
-            prev_line_position = line_position
-            line_position = measure(state)
-            next_sense += loop_dt
+            spool.put(time, measure(state))
+            if next_sense > 0.0:
+                next_sense += loop_dt
+            else:
+                next_sense = next_ctrl - sensor_lag
+                while next_sense <= 0.0:
+                    next_sense += loop_dt
+
 
         if time == next_ctrl:
+            line_position, prev_line_position = spool.get(time)
             speeds = f(line_position, prev_line_position)
             speeds = (speeds[0]+left_wheel_bias, speeds[1])
             states.append(state)
@@ -73,7 +78,8 @@ def simulate(f, loop_dt=1/20.,
             return ax
 
         if output == 'animate':
-            anim = animation.FuncAnimation(f, plotstep, frames=len(times))
+            print('Done simulating; Creating animation...')
+            anim = animation.FuncAnimation(f, plotstep, interval=20, frames=len(times))
             return HTML(anim.to_html5_video())
         
         if output == 'plot':
@@ -85,6 +91,9 @@ def simulate(f, loop_dt=1/20.,
 
 # state = x, y, angle (radians)
 def step(state, speeds, dt):
+    if dt == 0.0:
+        return state
+
     x = state[0]
     y = state[1]
     theta = state[2]
@@ -116,3 +125,37 @@ def measure(state):
     lp = ys/limit
     lp = max(-1.0, min(1.0, lp))
     return lp
+
+class SensorSpool(object):
+    def __init__(self, loop_dt, sensor_lag, init_meas=0.0, eps=0.0001):
+        self.eps = eps
+        self.sensor_lag = sensor_lag
+        mem_len = int(floor(sensor_lag/loop_dt)) + 2
+        self.times = [0.0 for i in range(mem_len)]
+        self.memory = [init_meas for i in range(mem_len)]
+        self.current = 0
+
+    def put(self, time, meas):
+        self.current += 1
+        if self.current == len(self.times):
+            self.current = 0
+        self.times[self.current] = time
+        self.memory[self.current] = meas
+
+    def get(self, time):
+        toget = self.current+2
+        if toget >= len(self.times):
+            toget -= len(self.times)
+        gettime = time - self.sensor_lag
+        if gettime > 0.0:
+            assert abs(self.times[toget] - gettime) < self.eps
+        return self.memory[toget], self.memory[toget-1]
+
+if __name__ == '__main__':
+    def control(lp, plp):
+        return 0.3, 0.3
+
+    simulate(control, output=None)
+    simulate(control, sensor_lag=0.0, output=None)
+    simulate(control, sensor_lag=0.01, output=None)
+    simulate(control, sensor_lag=0.035, output=None)
