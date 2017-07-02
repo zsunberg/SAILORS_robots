@@ -46,6 +46,7 @@ class SBot(object):
         self.set_mode(MANUAL_MODE, wait_for_ack=False)
         self.direct_send('l:0.0\n')
         self.direct_send('r:0.0\n')
+        time.sleep(0.1)
 
     def forward(self, speed):
         self.direct_send('l:{}\n'.format(speed))

@@ -17,7 +17,7 @@ turn_sequence = turns(graph, path)
 print turn_sequence
 raw_input("Press enter to go")
 
-with SBot(6) as car:
+with SBot(3) as car:
     for i in range(len(turn_sequence)):
         car.set_mode(1)
         car.wait_for_manual()
