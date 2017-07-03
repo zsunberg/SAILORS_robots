@@ -97,8 +97,8 @@ def step(state, speeds, dt):
     x = state[0]
     y = state[1]
     theta = state[2]
-    ls = speeds[0]
-    rs = speeds[1]
+    ls = min(1.0, max(-1.0, speeds[0])
+    rs = min(1.0, max(-1.0, speeds[1])
 
     if rs == ls:
         speed = rs
