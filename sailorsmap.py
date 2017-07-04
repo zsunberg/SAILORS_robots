@@ -1,58 +1,3 @@
-'''
-A class for representing a road map for sailors - uses igraph under the hood
-
-usage:
-
-    map = RoadMap('file.json')
-
-    map.neighbors(n) # return a list of the neighbors of n
-
-    map[1,2] # return the weight (distance between vertices) between 1 and 2
-
-    for i in map:
-        print i      # print the indices of all of the vertices in the map
-    
-    map.highlight_vertex(2) # will highlight vertex 2 the next time the graph is plotted
-    map.plot() # plots the map using matplotlib
-
-    map[n] # returns dictionary-like object with all the properties of node n
-
-    map.detect_cars() # detects road blocks
-
-    # other
-    map.delete_edge((1,2))
-    map.nearest_edge(xy)
-
-
-Each node has a
-number
-x and y location
-
-json file looks like:
-{"vertices":
-    [
-     ...
-        {"num":2,
-         "x":1.2,
-         "y":2.3,
-         "north":3
-         "south":3
-         "east":4
-         "west":5
-        },
-     ...
-    ],
- "curved":
-    [
-        [[1,2],14.7],
-     ...   
-    ]
- "passthrough": [3]
-}
-
-(passthrough are nodes that will be passed through without stopping)
-'''
-
 import igraph
 import json
 import pdb
@@ -68,6 +13,63 @@ from math import sqrt, acos, sin
 #plt.ion()
 
 class RoadMap(object):
+    '''
+    A class for representing a road map for sailors - uses igraph under the hood
+
+    usage:
+
+        map = RoadMap('file.json')
+
+        map.neighbors(n) # return a list of the neighbors of n
+
+        map[1,2] # return the weight (distance between vertices) between 1 and 2
+
+        for i in map:
+            print i      # print the indices of all of the vertices in the map
+        
+        map.highlight_vertex(2) # will highlight vertex 2 the next time the graph is plotted
+        map.plot() # plots the map using matplotlib
+
+        map[n] # returns dictionary-like object with all the properties of node n
+        map[n]['north'] # returns the vertex that you will end up at if you go north
+
+        len(map) # returns the number of nodes
+
+        map.detect_cars() # detects road blocks
+
+        # other
+        map.delete_edge((1,2))
+        map.nearest_edge(xy)
+
+    Each node has a
+    number
+    x and y location
+
+    json file looks like:
+    {"vertices":
+        [
+         ...
+            {"num":2,
+             "x":1.2,
+             "y":2.3,
+             "north":3
+             "south":3
+             "east":4
+             "west":5
+            },
+         ...
+        ],
+     "curved":
+        [
+            [[1,2],14.7],
+         ...   
+        ]
+     "passthrough": [3]
+    }
+
+    (passthrough are nodes that will be passed through without stopping)
+    '''
+
     def __init__(self, input_file='map_in_ASL.json'):
         
         with open(input_file) as file:
